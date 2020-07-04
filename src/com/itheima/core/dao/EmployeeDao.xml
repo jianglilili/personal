@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.core.dao.EmployeeDao">
+    <!--SQL片段  -->
+    <sql id="selectEmployeeListWhere">
+        <where>
+	       <if test="empl_name != null" >
+	           empl_name like "%"#{empl_name}"%"
+	       </if>
+	       <if test="empl_department != null" >
+	        and empl_department = #{empl_department}
+	       </if>
+	       <if test="empl_item != null" >
+	        and empl_item = #{empl_item}
+	       </if>
+        </where>
+    </sql>
+	<!-- 查询员工列表  -->
+	<select id="selectEmployeeList" parameterType="employee" 
+                                           resultType="employee">
+		SELECT
+			empl_id,
+			empl_name,
+			empl_user_id,
+			empl_create_id,
+			empl_sex,
+			c.dict_item_name empl_department,
+			d.dict_item_name empl_item,
+			empl_linkman,
+			empl_phone,
+			empl_mobile,
+			empl_createtime
+		FROM
+			employee a
+		LEFT JOIN (
+			SELECT
+				dict_id,
+				dict_item_name
+			FROM
+				base_dict
+			WHERE
+				dict_type_code = '001'
+		) c ON a.empl_department = c.dict_id
+		LEFT JOIN (
+			SELECT
+				dict_id,
+				dict_item_name
+			FROM
+				base_dict
+			WHERE
+				dict_type_code = '006'
+		) d ON a.empl_item = d.dict_id
+		<include refid="selectEmployeeListWhere"/>
+		<!-- 执行分页查询 -->
+		<if test="start !=null and rows != null">
+			limit #{start},#{rows}
+		</if>
+	</select>
+	<!-- 查询员工总数 -->
+	<select id="selectEmployeeListCount" parameterType="employee" 
+                                                 resultType="Integer">
+		select count(*) from employee
+		<include refid="selectEmployeeListWhere"/>
+	</select>	
+	
+	<!-- 添加客户 -->
+	<insert id="createEmployee" parameterType="employee">
+	    insert into employee(
+	                     empl_name,
+	                     
+	                     empl_user_id,
+	                     empl_create_id,
+	                     empl_sex,
+	                     <!-- 
+	                     empl_profession,
+	                      -->
+	                     empl_department,
+	                     empl_item,
+	                     empl_salary,
+	                     empl_linkman,
+	                     empl_phone,
+	                     empl_mobile,
+	                     empl_email,
+	                     empl_address,
+	                     empl_createtime
+	             )
+	             values(#{empl_name},
+	             		
+	                    #{empl_user_id},
+	                    #{empl_create_id},
+	                    #{empl_sex},
+	                    <!-- 
+	                    #{empl_profession},
+	                     -->
+	                    #{empl_department},
+	                    #{empl_item},
+	                    #{empl_salary},
+	                    #{empl_linkman},
+	                    #{empl_phone},
+	                    #{empl_mobile},
+	                    #{empl_email},
+	                    #{empl_address},
+	                    #{empl_createtime}
+	            )
+	</insert>
+	<!-- 根据id获取客户信息 -->
+	<select id="getEmployeeById" parameterType="Integer" 
+	resultType="employee">
+	    select * from employee where empl_id = #{id}
+	</select>
+	<!-- 更新客户 -->
+	<update id="updateEmployee" parameterType="employee">
+	    update employee
+	    <set>
+	        <if test="empl_name!=null">
+	            empl_name=#{empl_name},
+	        </if>
+	        <if test="empl_user_id!=null">
+	            empl_user_id=#{empl_user_id},
+	        </if>
+	        <if test="empl_create_id!=null">
+	            empl_create_id=#{empl_create_id},
+	        </if>
+	        <if test="empl_sex!=null">
+	        	empl_sex=#{empl_sex},
+	        </if>
+	        <if test="empl_department!=null">
+	            empl_department=#{empl_department},
+	        </if>
+	        <if test="empl_item!=null">
+	            empl_item=#{empl_item},
+	        </if>
+	        <if test="empl_item!=null">
+	            empl_item=#{empl_item},
+	        </if>
+	        <if test="empl_salary!=null">
+	            empl_salary=#{empl_salary},
+	        </if>
+	        <if test="empl_phone!=null">
+	            empl_phone=#{empl_phone},
+	        </if>
+	        <if test="empl_mobile!=null">
+	            empl_mobile=#{empl_mobile},
+	        </if>
+	        <if test="empl_email!=null">
+	            empl_email=#{empl_email},
+	        </if>
+	        <if test="empl_address!=null">
+	            empl_address=#{empl_address},
+	        </if>
+	        <if test="empl_createtime!=null">
+	            empl_createtime=#{empl_createtime},
+	        </if>
+	    </set>
+	    where empl_id=#{empl_id}
+	</update>
+	<!-- 删除客户 -->
+	<delete id="deleteEmployee" parameterType="Integer">
+	    delete from employee where empl_id=#{id}
+	</delete>
+</mapper>

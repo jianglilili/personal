@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.core.dao.DepartmentDao">
+	<!-- SQL片段 -->
+	<sql id="selectDepartmentListWhere">
+		<where>
+			<if test="dept_name!=null">
+				dept_name = #{dept_name}
+			</if>
+		</where>
+	</sql>
+	<!-- 查询部门列表 -->
+	<select id="selectDepartmentList" parameterType="department"
+											resultType="department">
+		SELECT
+			dept_id,
+			b.dict_item_name dept_name,
+			dept_phone,
+			dept_manager,
+			dept_number		
+		FROM
+			department a
+		LEFT JOIN (
+			SELECT
+				dict_id,
+				dict_item_name
+			FROM
+				base_dict
+			WHERE
+				dict_type_code='001'
+		)b ON a.dept_name = b.dict_id	
+		<include refid="selectDepartmentListWhere"/>
+		<!-- 执行分页查询 -->
+		<if test="start !=null and rows != null">
+			limit #{start},#{rows}
+		</if>
+	</select>
+	<!-- 查询客户总数 -->
+	<select id="selectDepartmentListCount" parameterType="department"
+											resultType="Integer">
+		select count(*) from department
+		<include refid="selectDepartmentListWhere"/>										
+	</select>
+</mapper>
